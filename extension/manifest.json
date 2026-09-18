@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Claudication",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Toolbar knee that hurts while Claude Code is working and relaxes when Claude is ready.",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6X90y0yRrfXckgXYxMbzHIcKdYpElkoWM128M8N4KSl+pEh86eRlPpafmVXoa7jiqWbng5zgNGdhtpqKg9U/tk0GevpgZOj1g5BT6kemNOiXcSqyKs7JSsry5o02aJ1DqWL5jOeamVj05kgq5RljzrAnG3GlqqKT8tYvMf0+tNBVITEX5ptdvAQnB7NIt1wTMupBidpYUuiY/xlBBM7+3zIavr1Kenky9nKopq4PbKSeU+dd3ZdeUpwTadBRjVWXv+fYmunhViaWW+pzmgw0abC0/otTjJatfuEABGIEbNwbeDpxUJxc8c+n9bQbnD65yxjpLM7asv1YL9aHeCk9uQIDAQAB",
   "permissions": ["nativeMessaging", "alarms"],
