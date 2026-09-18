@@ -61,6 +61,10 @@ def watch_stdin():
 
 
 def main():
+    if sys.platform == "win32":
+        import msvcrt
+        msvcrt.setmode(sys.stdin.fileno(), os.O_BINARY)
+        msvcrt.setmode(sys.stdout.fileno(), os.O_BINARY)
     threading.Thread(target=watch_stdin, daemon=True).start()
     last = None
     while True:
