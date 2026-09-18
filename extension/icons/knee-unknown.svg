@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Not connected: grey knee -->
+  <circle cx="64" cy="64" r="60" fill="#eeeeee"/>
+  <path d="M22 30 L74 58 L50 110" fill="none" stroke="#8a8a8a" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M50 110 L74 110" fill="none" stroke="#8a8a8a" stroke-width="16" stroke-linecap="round"/>
+  <circle cx="74" cy="58" r="15" fill="#aaaaaa"/>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Knee in pain: red throbbing knee with pain spikes -->
+  <circle cx="64" cy="64" r="60" fill="#fdeaea"/>
+  <path d="M22 30 L74 58 L50 110" fill="none" stroke="#b93a32" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M50 110 L74 110" fill="none" stroke="#b93a32" stroke-width="16" stroke-linecap="round"/>
+  <circle cx="74" cy="58" r="22" fill="#ff3b30" opacity="0.35"/>
+  <circle cx="74" cy="58" r="15" fill="#ff3b30"/>
+  <g stroke="#ff3b30" stroke-width="7" stroke-linecap="round" fill="none">
+    <path d="M100 30 L112 18"/>
+    <path d="M106 58 L122 58"/>
+    <path d="M100 86 L112 98"/>
+    <path d="M74 24 L74 8"/>
+  </g>
+</svg>
