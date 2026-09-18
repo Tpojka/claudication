@@ -46,6 +46,13 @@ class HookTest(IsolatedTestCase):
         titles = [c.args[0] for c in send.call_args_list]
         self.assertEqual(titles, ["Claude is ready · project", "Claude needs you · project"])
         self.assertEqual(send.call_args_list[1].args[1], "Claude needs your permission to use Bash")
+        self.assertTrue(send.call_args.kwargs["sound"])
+
+    @mock.patch("claudication.notify.send")
+    def test_sound_setting_is_passed_to_notifier(self, send):
+        config.save({"notifications": True, "sound": False})
+        self.run_hook("Stop")
+        self.assertFalse(send.call_args.kwargs["sound"])
 
     @mock.patch("claudication.notify.send")
     def test_idle_reminder_is_not_notified(self, send):

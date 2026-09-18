@@ -7,14 +7,14 @@ import sys
 _QUIET = {"stdout": subprocess.DEVNULL, "stderr": subprocess.DEVNULL}
 
 
-def send(title, message, icon):
+def send(title, message, icon, sound=True):
     """Show a notification without waiting for it, so the hook returns immediately."""
     if sys.platform == "darwin":
-        _macos(title, message)
+        _macos(title, message, sound)
     elif sys.platform == "win32":
-        _windows(title, message, icon)
+        _windows(title, message, icon, sound)
     else:
-        _linux(title, message, icon)
+        _linux(title, message, icon, sound)
 
 
 def setup_hint():
@@ -28,13 +28,12 @@ def setup_hint():
     return None
 
 
-def _macos(title, message):
+def _macos(title, message, sound):
     # Values are passed as arguments, so quotes in a message can't break the script.
-    script = [
-        "on run argv",
-        'display notification (item 2 of argv) with title "Claudication" subtitle (item 1 of argv) sound name "Glass"',
-        "end run",
-    ]
+    display = 'display notification (item 2 of argv) with title "Claudication" subtitle (item 1 of argv)'
+    if sound:
+        display += ' sound name "Glass"'
+    script = ["on run argv", display, "end run"]
     args = ["osascript"]
     for line in script:
         args += ["-e", line]
@@ -44,9 +43,12 @@ def _macos(title, message):
 LINUX_SOUND = "/usr/share/sounds/freedesktop/stereo/complete.oga"
 
 
-def _linux(title, message, icon):
-    subprocess.Popen(["notify-send", "-a", "Claudication", "-i", str(icon), title, message], start_new_session=True, **_QUIET)
-    if shutil.which("paplay"):
+def _linux(title, message, icon, sound):
+    command = ["notify-send", "-a", "Claudication", "-i", str(icon)]
+    if not sound:
+        command.append("--hint=boolean:suppress-sound:true")  # some desktops add their own sound
+    subprocess.Popen(command + [title, message], start_new_session=True, **_QUIET)
+    if sound and shutil.which("paplay"):
         subprocess.Popen(["paplay", LINUX_SOUND], start_new_session=True, **_QUIET)
 
 
@@ -54,6 +56,7 @@ def _linux(title, message, icon):
 WINDOWS_APP_ID = r"{1AC14E77-02E7-4E5D-B744-2EB1AE5198B7}\WindowsPowerShell\v1.0\powershell.exe"
 
 # Values arrive via environment variables and are XML-escaped, so a message can't inject markup.
+# CLAUDICATION_AUDIO is one of the two constants below, never user text.
 WINDOWS_SCRIPT = r"""
 [Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null
 [Windows.Data.Xml.Dom.XmlDocument, Windows.Data.Xml.Dom.XmlDocument, ContentType = WindowsRuntime] | Out-Null
@@ -61,21 +64,25 @@ $t = [Security.SecurityElement]::Escape($env:CLAUDICATION_TITLE)
 $m = [Security.SecurityElement]::Escape($env:CLAUDICATION_MESSAGE)
 $i = [Security.SecurityElement]::Escape($env:CLAUDICATION_ICON)
 $xml = New-Object Windows.Data.Xml.Dom.XmlDocument
-$xml.LoadXml("<toast><visual><binding template='ToastGeneric'><text>$t</text><text>$m</text><image placement='appLogoOverride' src='$i'/></binding></visual><audio src='ms-winsoundevent:Notification.Default'/></toast>")
+$xml.LoadXml("<toast><visual><binding template='ToastGeneric'><text>$t</text><text>$m</text><image placement='appLogoOverride' src='$i'/></binding></visual>$($env:CLAUDICATION_AUDIO)</toast>")
 $toast = New-Object Windows.UI.Notifications.ToastNotification $xml
 [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier($env:CLAUDICATION_APP_ID).Show($toast)
 """
 
+WINDOWS_SOUND = "<audio src='ms-winsoundevent:Notification.Default'/>"
+WINDOWS_SILENT = "<audio silent='true'/>"  # without it, Windows plays its default sound
+
 CREATE_NO_WINDOW = 0x08000000
 
 
-def _windows(title, message, icon):
+def _windows(title, message, icon, sound):
     env = dict(
         os.environ,
         CLAUDICATION_TITLE=title,
         CLAUDICATION_MESSAGE=message,
         CLAUDICATION_ICON=icon.as_uri(),
         CLAUDICATION_APP_ID=WINDOWS_APP_ID,
+        CLAUDICATION_AUDIO=WINDOWS_SOUND if sound else WINDOWS_SILENT,
     )
     command = ["powershell.exe", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-Command", WINDOWS_SCRIPT]
     subprocess.Popen(command, env=env, creationflags=CREATE_NO_WINDOW, **_QUIET)

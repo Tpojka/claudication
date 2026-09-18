@@ -3,7 +3,7 @@ import json
 
 from . import paths
 
-DEFAULTS = {"notifications": False}
+DEFAULTS = {"notifications": False, "sound": True}
 
 
 def load():

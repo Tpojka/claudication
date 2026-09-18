@@ -28,10 +28,11 @@ def handle(payload):
     else:
         state.set_state(session, value)
 
-    if config.load()["notifications"]:
+    settings = config.load()
+    if settings["notifications"]:
         message = notification_for(event, payload)
         if message:
-            notify.send(*message)
+            notify.send(*message, sound=settings["sound"])
 
 
 def notification_for(event, payload):
