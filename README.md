@@ -139,3 +139,7 @@ uninstall.cmd       # Windows
 This removes the hooks, the native host registration and the data directory. Then remove the extension from `chrome://extensions`.
 
 See [CHANGELOG.md](CHANGELOG.md) for release history.
+
+## License
+
+[MIT](LICENSE) © 2026 Goran Grbic

@@ -3,6 +3,12 @@
 All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- MIT license.
+
 ## [2.1.0] - 2026-09-18
 
 ### Added
@@ -76,6 +82,7 @@ Tag: `chrome-extension-v1.0.0`.
 - Claude Code hooks that record per-session state, and a native messaging host that pushes it to the extension.
 - A macOS installer.
 
+[Unreleased]: https://github.com/Tpojka/claudication/compare/v2.1.0...HEAD
 [2.1.0]: https://github.com/Tpojka/claudication/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/Tpojka/claudication/compare/chrome-all-os-v1.1.0...v2.0.0
 [1.1.0]: https://github.com/Tpojka/claudication/compare/chrome-extension-v1.0.0...chrome-all-os-v1.1.0
