@@ -1,4 +1,5 @@
 @echo off
-REM Windows entry point; the real installer is install.py.
+REM Windows: install Claudication (see claudication\install).
+cd /d "%~dp0"
 where py >nul 2>nul
-if %errorlevel%==0 (py -3 "%~dp0install.py" %*) else (python "%~dp0install.py" %*)
+if %errorlevel%==0 (py -3 -m claudication.install %*) else (python -m claudication.install %*)

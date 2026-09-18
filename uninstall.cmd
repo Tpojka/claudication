@@ -1,4 +1,5 @@
 @echo off
-REM Windows entry point; the real uninstaller is install.py.
+REM Windows: remove Claudication.
+cd /d "%~dp0"
 where py >nul 2>nul
-if %errorlevel%==0 (py -3 "%~dp0install.py" uninstall) else (python "%~dp0install.py" uninstall)
+if %errorlevel%==0 (py -3 -m claudication.install uninstall) else (python -m claudication.install uninstall)
