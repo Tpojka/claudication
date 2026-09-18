@@ -23,11 +23,13 @@ The installer detects your OS and asks what to install:
 
 ```
   1) Chrome extension
-  2) Chrome extension + notifier
+  2) Chrome extension + OS notifier
   3) Nothing (exit)
 ```
 
-To skip the prompt, pass the choice directly: `python3 -m claudication.install 2`.
+If you choose 2, it also asks `Play a sound with notifications? [Y/n]`.
+
+To skip the prompts, pass the choice directly: `python3 -m claudication.install 2` (with sound) or `python3 -m claudication.install 2 --no-sound`.
 
 Everything is copied into a per-user data directory, so you can move or delete the repository afterwards:
 
@@ -44,15 +46,44 @@ Then load the extension from that directory (only needed once):
 3. Pin **Claudication** to the toolbar.
 4. Restart any running Claude Code sessions so they load the hooks.
 
-Running the installer again is safe. It updates the installed copy and replaces its own hooks, leaves your other hooks alone, and backs up `~/.claude/settings.json` to `settings.json.claudication.bak` first. To turn the notifier on or off, run it again and choose 2 or 1.
+Running the installer again is safe. It updates the installed copy and replaces its own hooks, leaves your other hooks alone, and backs up `~/.claude/settings.json` to `settings.json.claudication.bak` first. To change the notifier later, see [Notifier settings](#notifier-settings).
 
-## Notifier
+## OS notifier
 
-When the notifier is on, you get a notification when Claude finishes a task or needs your permission or input. The title includes the project folder name.
+When the OS notifier is on, you get a notification when Claude finishes a task or needs your permission or input. The title includes the project folder name.
 
 - **macOS:** built-in `osascript`, with the Glass sound. The first time, allow notifications for **Script Editor** in System Settings → Notifications.
-- **Ubuntu/Linux:** `notify-send` (`sudo apt install libnotify-bin`), plus a sound through `paplay` when available.
-- **Windows:** a toast through built-in PowerShell. No modules are needed.
+- **Ubuntu/Linux:** `notify-send` (`sudo apt install libnotify-bin`), with the freedesktop "complete" sound through `paplay` when available.
+- **Windows:** a toast through built-in PowerShell, with the default notification sound. No modules are needed.
+
+### Notifier settings
+
+Change the settings from the terminal, run from the repository. They take effect with the next notification, with no reinstall or restart:
+
+```sh
+python3 -m claudication.install set sound off           # silent notifications
+python3 -m claudication.install set sound on
+python3 -m claudication.install set notifications off   # no notifications at all
+python3 -m claudication.install set notifications on
+```
+
+On Windows, use `py -3` instead of `python3`.
+
+The settings are stored in `config.json` in the [data directory](#install), which you can also edit by hand:
+
+```json
+{ "notifications": true, "sound": false }
+```
+
+You can also mute or turn off the notifications in your OS settings, without touching Claudication:
+
+| OS | Where |
+| --- | --- |
+| macOS | System Settings → Notifications → **Script Editor**: turn off "Play sound for notification", or turn notifications off |
+| Ubuntu (GNOME) | Settings → Sound → **System Sounds** volume, or Settings → Notifications → Do Not Disturb |
+| Windows | Settings → System → Notifications → **Windows PowerShell**: turn off "Play a sound when a notification arrives", or turn notifications off |
+
+The notifications come from Script Editor on macOS and Windows PowerShell on Windows, because those are the built-in tools that show them. Changing these OS settings also affects other scripts that use the same tools.
 
 ## How it works
 

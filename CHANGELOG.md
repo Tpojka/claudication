@@ -3,6 +3,23 @@
 All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/).
 
+## [2.1.0] - 2026-09-18
+
+### Added
+
+- **Optional notification sound.** When you choose the notifier, the installer asks `Play a sound with notifications? [Y/n]`. The answer is stored as `"sound"` in `config.json`. Without prompting: `python3 -m claudication.install 2 --no-sound`.
+  *Why:* some people want the visual cue without the noise, and muting in the OS isn't obvious. On macOS, for example, the setting is under Script Editor.
+  - macOS: leaves out `sound name "Glass"` from the notification.
+  - Ubuntu/Linux: skips `paplay`, and passes the `suppress-sound` hint so desktops that add their own sound stay quiet.
+  - Windows: sends `<audio silent='true'/>`. Leaving the audio element out entirely would still play Windows' default sound.
+- **`set` command** to change settings after installing: `python3 -m claudication.install set sound|notifications on|off`.
+  *Why:* the hook reads `config.json` on every event, so a setting can change without a reinstall. The command saves users from having to find the file on each OS.
+- README section on the notifier settings: the terminal commands, `config.json`, and where to mute notifications in each OS's settings.
+
+### Changed
+
+- Menu option 2 is renamed from "Chrome extension + notifier" to "Chrome extension + OS notifier", to make clear the notifications come from the operating system rather than Chrome.
+
 ## [2.0.0] - 2026-09-18
 
 A restructure for maintainability. What the extension does is unchanged, and it keeps the same extension ID. The install is not compatible with 1.x: run the new installer, then load the extension again from the new location (see **Upgrading from 1.x**).
@@ -59,6 +76,7 @@ Tag: `chrome-extension-v1.0.0`.
 - Claude Code hooks that record per-session state, and a native messaging host that pushes it to the extension.
 - A macOS installer.
 
+[2.1.0]: https://github.com/Tpojka/claudication/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/Tpojka/claudication/compare/chrome-all-os-v1.1.0...v2.0.0
 [1.1.0]: https://github.com/Tpojka/claudication/compare/chrome-extension-v1.0.0...chrome-all-os-v1.1.0
 [1.0.0]: https://github.com/Tpojka/claudication/releases/tag/chrome-extension-v1.0.0
