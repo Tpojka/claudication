@@ -1,8 +1,10 @@
 """Installer: copies the app and extension into the per-user data directory, then wires up Chrome and Claude Code.
 
-Usage: python3 -m claudication.install              interactive menu
-       python3 -m claudication.install 1|2|3        pick a menu option without prompting
-       python3 -m claudication.install uninstall    remove everything
+Usage: python3 -m claudication.install                      interactive menu
+       python3 -m claudication.install 1|2|3 [--no-sound]   pick a menu option without prompting
+       python3 -m claudication.install set sound on|off     change a setting of the installed app
+       python3 -m claudication.install set notifications on|off
+       python3 -m claudication.install uninstall            remove everything
 """
 import shutil
 import sys
@@ -19,7 +21,7 @@ MENU = """
 Claudication {version} installer ({os})
 
   1) Chrome extension
-  2) Chrome extension + notifier
+  2) Chrome extension + OS notifier
   3) Nothing (exit)
 """
 
@@ -30,11 +32,18 @@ def main(argv=None):
     if arg == "uninstall":
         uninstall()
         return
-    choice = arg if arg in ("1", "2", "3") else ask()
+    if arg == "set":
+        set_option(*argv[1:3])
+        return
+    if arg in ("1", "2", "3"):
+        choice, sound = arg, "--no-sound" not in argv
+    else:
+        choice = ask()
+        sound = choice == "2" and ask_yes_no("Play a sound with notifications?")
     if choice == "3":
         print("Nothing installed.")
         return
-    install(notifications=choice == "2")
+    install(notifications=choice == "2", sound=sound)
 
 
 def ask():
@@ -49,7 +58,32 @@ def ask():
             return choice
 
 
-def install(notifications):
+def ask_yes_no(question):
+    while True:
+        try:
+            answer = input(f"{question} [Y/n]: ").strip().lower()
+        except (EOFError, KeyboardInterrupt):
+            print()
+            return True
+        if answer in ("", "y", "yes"):
+            return True
+        if answer in ("n", "no"):
+            return False
+
+
+def set_option(name=None, value=None):
+    """Change one setting in the installed config.json; the hook picks it up on its next event."""
+    if name not in config.DEFAULTS or value not in ("on", "off"):
+        sys.exit("usage: python3 -m claudication.install set sound|notifications on|off")
+    if not paths.config_file().exists():
+        sys.exit("Claudication isn't installed. Run the installer first.")
+    settings = config.load()
+    settings[name] = value == "on"
+    config.save(settings)
+    print(f"✓ {name.capitalize()} {value}")
+
+
+def install(notifications, sound=True):
     data = paths.data_dir()
     data.mkdir(parents=True, exist_ok=True)
     _remove_legacy_state()
@@ -63,14 +97,14 @@ def install(notifications):
     claude_settings.install(f'{system.python_command()} "{app.as_posix()}" hook')
     print(f"✓ Claude Code hooks added to {claude_settings.settings_path()} (backup: settings.json.claudication.bak)")
 
-    config.save({"notifications": notifications})
+    config.save({"notifications": notifications, "sound": sound})
     if notifications:
-        print("✓ Notifier on: a notification appears when Claude finishes or needs you")
+        print(f"✓ OS notifier on, {'with' if sound else 'without'} sound: a notification appears when Claude finishes or needs you")
         hint = notify.setup_hint()
         if hint:
             print(f"  ! {hint}")
     else:
-        print("✓ Notifier off")
+        print("✓ OS notifier off")
 
     print(
         f"""

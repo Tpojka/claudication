@@ -4,6 +4,7 @@ import os
 import subprocess
 import sys
 from contextlib import redirect_stdout
+from unittest import mock
 
 from claudication import config, install, paths
 from claudication.install import claude_settings, system
@@ -40,6 +41,39 @@ class InstallTest(IsolatedTestCase):
         payload = json.dumps({"hook_event_name": "UserPromptSubmit", "session_id": "s1"})
         subprocess.run([sys.executable, str(paths.app_file()), "hook"], input=payload.encode(), check=True, cwd=self.home)
         self.assertEqual((paths.sessions_dir() / "s1").read_text(), "busy")
+
+    def test_menu_asks_about_sound_only_for_the_notifier(self):
+        self.addCleanup(system.unregister_host)
+        with mock.patch("builtins.input", side_effect=["2", "n"]):
+            out = self.run_installer()
+        self.assertIn("2) Chrome extension + OS notifier", out)
+        self.assertEqual(config.load(), {"notifications": True, "sound": False})
+
+        with mock.patch("builtins.input", side_effect=["1"]) as ask:
+            self.run_installer()
+        self.assertEqual(ask.call_count, 1)
+
+    def test_sound_flag_without_prompting(self):
+        self.addCleanup(system.unregister_host)
+        self.run_installer("2", "--no-sound")
+        self.assertFalse(config.load()["sound"])
+        self.run_installer("2")
+        self.assertTrue(config.load()["sound"])
+
+    def test_set_changes_installed_setting(self):
+        self.addCleanup(system.unregister_host)
+        self.run_installer("2")
+        self.assertIn("Sound off", self.run_installer("set", "sound", "off"))
+        self.assertEqual(config.load(), {"notifications": True, "sound": False})
+        self.run_installer("set", "notifications", "off")
+        self.assertFalse(config.load()["notifications"])
+
+    def test_set_rejects_bad_input_and_missing_install(self):
+        with self.assertRaises(SystemExit):
+            self.run_installer("set", "sound", "on")  # not installed yet
+        self.run_installer("3")
+        with self.assertRaises(SystemExit):
+            self.run_installer("set", "volume", "on")
 
     def test_option_1_turns_notifier_off(self):
         self.addCleanup(system.unregister_host)
