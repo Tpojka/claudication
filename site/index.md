@@ -1,5 +1,7 @@
 # Claudication
 
+> **Archived.** Claudication is now part of [Perturbation](https://perturbation.tpojka.com), one Chrome toolbar lamp for Claude Code, Codex CLI, GitHub Copilot CLI, Antigravity CLI, opencode, Goose and Qwen Code. Its installer finds Claudication and offers to remove it: <https://perturbation.tpojka.com>
+
 **Your knee hurts while Claude works. It relaxes when Claude is ready.**
 
 A Chrome toolbar button that shows whether Claude Code is working, with optional desktop notifications. It works on macOS, Ubuntu and Windows.
@@ -118,3 +120,5 @@ It covers **Claude Code**: the terminal, IDE extensions and the Desktop app's Co
 ---
 
 Claudication 2.1.0 · [MIT](https://github.com/Tpojka/claudication/blob/main/LICENSE) © 2026 Goran Grbic · An independent project, not affiliated with Anthropic.
+
+Archived in favor of [Perturbation](https://perturbation.tpojka.com).
